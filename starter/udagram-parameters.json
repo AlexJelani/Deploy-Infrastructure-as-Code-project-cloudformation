@@ -1,6 +1,9 @@
 [
 	{
-		"ParameterKey": "Add you parameters here",
-		"ParameterValue": "Add you parameters here"
-	}
+		"Parameters": {
+		  "ProjectName": "udagram",
+		  "NetworkStackName": "udagram-network"
+		}
+	  }
+	  
 ]
