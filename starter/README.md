@@ -1,11 +1,36 @@
 # CD12352 - Infrastructure as Code Project Solution
-# [YOUR NAME HERE]
+# [Jelani Alexander]
 
 ## Spin up instructions
-TODO
+# CD12352 - Infrastructure as Code Project Solution
 
+# Infrastructure Deployment Guide
+
+## Spin up instructions
+
+* Deploy the network stack:
+```
+./infrastructure.sh deploy us-east-1 udagram-network network.yml network-parameters.json
+```
+* Deploy the application stack:
+  
+```
+./infrastructure.sh deploy us-east-1 udagram-app udagram.yml udagram-parameters.json
+```
+  
 ## Tear down instructions
-TODO
+* Delete the application stack:
 
+```
+./infrastructure.sh delete us-east-1 udagram-app
+```
+* Delete the network stack:
+```
+./infrastructure.sh delete us-east-1 udagram-network
+``` 
 ## Other considerations
-TODO (optional)
+* The infrastructure uses high availability design with resources across multiple AZs
+* Auto Scaling Group maintains 4 servers in private subnets
+* S3 bucket automatically empties before stack deletion
+* Health checks are configured for the Load Balancer
+* All resources are properly tagged for cost tracking  
