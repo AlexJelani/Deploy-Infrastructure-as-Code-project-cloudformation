@@ -1,9 +1,10 @@
 [
 	{
-		"Parameters": {
-		  "ProjectName": "udagram",
-		  "NetworkStackName": "udagram-network"
-		}
-	  }
-	  
+		"ParameterKey": "ProjectName",
+		"ParameterValue": "udagram"
+	},
+	{
+		"ParameterKey": "NetworkStackName",
+		"ParameterValue": "udagram-network"
+	}
 ]
