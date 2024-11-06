@@ -6,6 +6,19 @@
 
 # Infrastructure Deployment Guide
 
+## Preview instructions
+
+* Preview the network stack:
+```
+./infrastructure.sh preview us-east-1 udagram-network network.yml network-parameters.json
+```
+* Preview the application stack:
+```
+./infrastructure.sh preview us-east-1 udagram-app udagram.yml udagram-parameters.json
+```
+
+
+
 ## Spin up instructions
 
 * Deploy the network stack:
