@@ -6,5 +6,9 @@
 	{
 		"ParameterKey": "NetworkStackName",
 		"ParameterValue": "udagram-network"
+	},
+	{
+		"ParameterKey": "BucketName",
+		"ParameterValue": "udagram-bucket-104101593733-2024"
 	}
 ]
