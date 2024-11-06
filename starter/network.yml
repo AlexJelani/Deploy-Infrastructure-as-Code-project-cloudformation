@@ -14,19 +14,23 @@ Parameters:
     Type: String
 
   PublicSubnet1CIDR:
-    Description: IP range in CIDR notation for the public subnet in the first Availability Zone
+    Description: IP range in CIDR notation for the public subnet in the first
+      Availability Zone
     Type: String
 
   PublicSubnet2CIDR:
-    Description: IP range in CIDR notation for the public subnet in the second Availability Zone
+    Description: IP range in CIDR notation for the public subnet in the second
+      Availability Zone
     Type: String
 
   PrivateSubnet1CIDR:
-    Description: IP range in CIDR notation for the private subnet in the first Availability Zone
+    Description: IP range in CIDR notation for the private subnet in the first
+      Availability Zone
     Type: String
 
   PrivateSubnet2CIDR:
-    Description: IP range in CIDR notation for the private subnet in the second Availability Zone
+    Description: IP range in CIDR notation for the private subnet in the second
+      Availability Zone
     Type: String
 
 Resources:
@@ -56,7 +60,9 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      AvailabilityZone: !Select [0, !GetAZs '']
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs ''
       CidrBlock: !Ref PublicSubnet1CIDR
       MapPublicIpOnLaunch: true
       Tags:
@@ -67,7 +73,9 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      AvailabilityZone: !Select [1, !GetAZs '']
+      AvailabilityZone: !Select
+        - 1
+        - !GetAZs ''
       CidrBlock: !Ref PublicSubnet2CIDR
       MapPublicIpOnLaunch: true
       Tags:
@@ -78,7 +86,9 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      AvailabilityZone: !Select [0, !GetAZs '']
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs ''
       CidrBlock: !Ref PrivateSubnet1CIDR
       MapPublicIpOnLaunch: false
       Tags:
@@ -89,7 +99,9 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      AvailabilityZone: !Select [1, !GetAZs '']
+      AvailabilityZone: !Select
+        - 1
+        - !GetAZs ''
       CidrBlock: !Ref PrivateSubnet2CIDR
       MapPublicIpOnLaunch: false
       Tags:
@@ -211,13 +223,19 @@ Outputs:
 
   PublicSubnets:
     Description: A list of the public subnets
-    Value: !Join [',', [!Ref PublicSubnet1, !Ref PublicSubnet2]]
+    Value: !Join
+      - ','
+      - - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
     Export:
       Name: !Sub ${ProjectName}-public-subnets
 
   PrivateSubnets:
     Description: A list of the private subnets
-    Value: !Join [',', [!Ref PrivateSubnet1, !Ref PrivateSubnet2]]
+    Value: !Join
+      - ','
+      - - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
     Export:
       Name: !Sub ${ProjectName}-private-subnets
 
@@ -226,6 +244,7 @@ Outputs:
     Value: !Ref PublicSubnet1
     Export:
       Name: !Sub ${ProjectName}-public-subnet1
+
 
   PublicSubnet2:
     Description: A reference to the public subnet in the 2nd Availability Zone

@@ -4,7 +4,7 @@ Parameters:
   ProjectName:
     Type: String
     Description: Project name for resource tagging
-    
+
   NetworkStackName:
     Type: String
     Description: Name of the networking stack to reference
@@ -28,7 +28,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal: '*'
-            Action: 's3:GetObject'
+            Action: s3:GetObject
             Resource: !Sub ${WebAppS3Bucket.Arn}/*
 
   WebServerRole:
@@ -53,7 +53,7 @@ Resources:
                   - s3:PutObject
                   - s3:GetObject
                   - s3:ListBucket
-                Resource: 
+                Resource:
                   - !GetAtt WebAppS3Bucket.Arn
                   - !Sub ${WebAppS3Bucket.Arn}/*
 
@@ -67,8 +67,8 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow HTTP from ALB
-      VpcId: 
-        Fn::ImportValue: !Sub ${NetworkStackName}-VPCID
+      VpcId: !ImportValue
+        Fn::Sub: ${NetworkStackName}-VPCID
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -79,8 +79,8 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow HTTP from anywhere
-      VpcId: 
-        Fn::ImportValue: !Sub ${NetworkStackName}-VPCID
+      VpcId: !ImportValue
+        Fn::Sub: ${NetworkStackName}-VPCID
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -91,14 +91,14 @@ Resources:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateData:
-        ImageId: ami-0c7217cdde317cfec  # Ubuntu 22.04 LTS
+        ImageId: ami-0c7217cdde317cfec # Ubuntu 22.04 LTS
         InstanceType: t2.micro
-        SecurityGroupIds: 
+        SecurityGroupIds:
           - !Ref WebServerSecurityGroup
         IamInstanceProfile:
           Name: !Ref WebServerInstanceProfile
-        UserData:
-          Fn::Base64: !Sub |
+        UserData: !Base64
+          Fn::Sub: |
             #!/bin/bash
             apt-get update -y
             apt-get install apache2 -y
@@ -110,9 +110,11 @@ Resources:
       Type: application
       SecurityGroups:
         - !Ref LoadBalancerSecurityGroup
-      Subnets: 
-        - Fn::ImportValue: !Sub ${NetworkStackName}-public-subnet1
-        - Fn::ImportValue: !Sub ${NetworkStackName}-public-subnet2
+      Subnets:
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-public-subnet1
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-public-subnet2
 
   WebAppListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -129,8 +131,8 @@ Resources:
     Properties:
       Port: 80
       Protocol: HTTP
-      VpcId:
-        Fn::ImportValue: !Sub ${NetworkStackName}-VPCID
+      VpcId: !ImportValue
+        Fn::Sub: ${NetworkStackName}-VPCID
       HealthCheckPath: /
       HealthCheckIntervalSeconds: 30
 
@@ -138,8 +140,10 @@ Resources:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       VPCZoneIdentifier:
-        - Fn::ImportValue: !Sub ${NetworkStackName}-private-subnet1
-        - Fn::ImportValue: !Sub ${NetworkStackName}-private-subnet2
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-private-subnet1
+        - !ImportValue
+          Fn::Sub: ${NetworkStackName}-private-subnet2
       LaunchTemplate:
         LaunchTemplateId: !Ref WebAppLaunchTemplate
         Version: !GetAtt WebAppLaunchTemplate.LatestVersionNumber
