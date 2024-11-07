@@ -1,3 +1,4 @@
+AWSTemplateFormatVersion: '2010-09-09'
 Description: CD12352 - Infrastructure as Code Project - Udagram
 
 Parameters:
@@ -12,6 +13,10 @@ Parameters:
   BucketName:
     Type: String
     Description: Name for the S3 bucket
+
+  YourHomeIPAddress:
+    Type: String
+    Description: Your home IP address in CIDR notation (e.g., 1.2.3.4/32)
 
 Resources:
   WebAppS3Bucket:
@@ -71,7 +76,7 @@ Resources:
   WebServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow HTTP from ALB
+      GroupDescription: Allow HTTP from ALB and SSH from Bastion
       VpcId: !ImportValue
         Fn::Sub: ${NetworkStackName}-VPCID
       SecurityGroupIngress:
@@ -79,6 +84,10 @@ Resources:
           FromPort: 80
           ToPort: 80
           SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref BastionHostSecurityGroup
 
   LoadBalancerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -96,7 +105,7 @@ Resources:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateData:
-        ImageId: ami-0c7217cdde317cfec # Ubuntu 22.04 LTS
+        ImageId: ami-0c7217cdde317cfec
         InstanceType: t2.micro
         SecurityGroupIds:
           - !Ref WebServerSecurityGroup
@@ -108,23 +117,19 @@ Resources:
             apt-get update -y
             apt-get install apache2 -y
             systemctl start apache2.service
-
-          #   # Create and place index.html directly in the web directory
-          #  cat <<EOF > /var/www/html/index.html
-          #   <!DOCTYPE html>
-          #     <html>
-          #     <head>
-          #          <title>It works! Udagram, Udacity</title>
-          #     </head>
-          #     <body>
-          #   <h1>It works! Udagram, Udacity</h1>
-          #   <p>This website is hosted on Apache2.</p>
-          #     </body>
-          #     </html>
-          #     EOF
-
-          #   # Restart Apache2 to apply changes
-          #   systemctl restart apache2
+            # cat <<EOF > /var/www/html/index.html
+            # <!DOCTYPE html>
+            # <html>
+            # <head>
+            #     <title>It works! Udagram, Udacity</title>
+            # </head>
+            # <body>
+            #     <h1>It works! Udagram, Udacity</h1>
+            #     <p>This website is hosted on Apache2.</p>
+            # </body>
+            # </html>
+            # EOF
+            # systemctl restart apache2
 
   WebAppLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -175,9 +180,70 @@ Resources:
       TargetGroupARNs:
         - !Ref WebAppTargetGroup
 
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt WebAppLoadBalancer.DNSName
+            Id: LoadBalancerOrigin
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: http-only
+        Enabled: true
+        DefaultCacheBehavior:
+          TargetOriginId: LoadBalancerOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+        PriceClass: PriceClass_100
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+  BastionHostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for bastion host
+      VpcId: !ImportValue 
+        Fn::Sub: ${NetworkStackName}-VPCID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref YourHomeIPAddress
+
+  BastionHost:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c7217cdde317cfec
+      SubnetId: !ImportValue 
+        Fn::Sub: ${NetworkStackName}-public-subnet1
+      SecurityGroupIds: 
+        - !Ref BastionHostSecurityGroup
+      KeyName: vockey
+      Tags:
+        - Key: Name
+          Value: Bastion Host
+
 Outputs:
   LoadBalancerEndpoint:
     Description: Public URL of the Application Load Balancer
     Value: !Sub http://${WebAppLoadBalancer.DNSName}
     Export:
       Name: !Sub ${ProjectName}-LB-URL
+
+  CloudFrontDomainName:
+    Description: CloudFront Distribution Domain Name
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: !Sub ${ProjectName}-CloudFront-URL
+
+  BastionHostPublicIP:
+    Description: Public IP of Bastion Host
+    Value: !GetAtt BastionHost.PublicIp
+    Export:
+      Name: !Sub ${ProjectName}-BastionHost-IP

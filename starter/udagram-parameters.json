@@ -1,14 +1,18 @@
 [
-	{
-		"ParameterKey": "ProjectName",
-		"ParameterValue": "udagram"
-	},
-	{
-		"ParameterKey": "NetworkStackName",
-		"ParameterValue": "udagram-network"
-	},
-	{
-		"ParameterKey": "BucketName",
-		"ParameterValue": "udagram-bucket-104101593733-2024"
-	}
+    {
+        "ParameterKey": "ProjectName",
+        "ParameterValue": "udagram"
+    },
+    {
+        "ParameterKey": "NetworkStackName",
+        "ParameterValue": "udagram-network"
+    },
+    {
+        "ParameterKey": "BucketName",
+        "ParameterValue": "udagram-bucket-104101593733-2024"
+    },
+    {
+        "ParameterKey": "YourHomeIPAddress",
+        "ParameterValue": "YOUR_IP_ADDRESS/32"
+    }
 ]
