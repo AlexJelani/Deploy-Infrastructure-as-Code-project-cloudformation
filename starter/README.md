@@ -47,3 +47,7 @@
 * S3 bucket automatically empties before stack deletion
 * Health checks are configured for the Load Balancer
 * All resources are properly tagged for cost tracking  
+
+## Output
+* Load balancer URL: http://udagram-app-loadbalancer-1234567890.us-east-1.elb.amazonaws.com
+
