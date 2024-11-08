@@ -13,6 +13,6 @@
     },
     {
         "ParameterKey": "YourHomeIPAddress",
-        "ParameterValue": "YOUR_IP_ADDRESS/32"
+        "ParameterValue": "223.133.249.168/32"
     }
 ]
