@@ -102,6 +102,13 @@ Resources:
           - !Ref WebServerSecurityGroup
         IamInstanceProfile:
           Name: !Ref WebServerInstanceProfile
+        # Configure root EBS volume with 10GB to meet storage requirements
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              VolumeSize: 10
+              VolumeType: gp2
+              DeleteOnTermination: true
         UserData: !Base64
           Fn::Sub: |
             #!/bin/bash
@@ -124,8 +131,7 @@ Resources:
             EOF
 
             # Restart Apache2 to apply changes
-            systemctl restart apache2            
-
+            systemctl restart apache2
   WebAppLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
