@@ -49,5 +49,5 @@
 * All resources are properly tagged for cost tracking  
 
 ## Output
-* Load balancer URL: http://udagram-app-loadbalancer-1234567890.us-east-1.elb.amazonaws.com
+* Load balancer URL: http://udagra-webap-a7aker6imcqw-1266749256.us-east-1.elb.amazonaws.com/
 
